@@ -128,6 +128,7 @@ export default {
         display: block
         transform: rotate(45deg)
         z-index: 3
+        opacity: 0.7
       &:after
         position: absolute
         content: ''
@@ -137,5 +138,6 @@ export default {
         display: block
         transform: rotate(-45deg)
         z-index: 3
+        opacity: 0.7
 
 </style>

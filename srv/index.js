@@ -47,6 +47,8 @@ export default (app, http) => {
   })
 
   app.post('/setName', (req, res) => {
+    if(!req.body.name) return
+
     const user_id = uuidv4()
     const user_public_id = uuidv4()
 
@@ -62,6 +64,7 @@ export default (app, http) => {
   })
 
   app.post('/createRoom', (req, res) => {
+    if (!req.body.form) return
     if (!req.body.form.roomTitle) return
 
     const room_id = uuidv4()
@@ -147,6 +150,7 @@ export default (app, http) => {
       socket.join(roomInfo.room_id)
 
       if (!rooms[roomInfo.room_id]) return
+
       if (!rooms[roomInfo.room_id].users.find(user => user.user_id === userInfo.user_id)) {
 
         const user = {
@@ -232,6 +236,7 @@ export default (app, http) => {
       if (rooms[roomInfo.room_id].gameData.tiles[y][x].bomb) {
         rooms[roomInfo.room_id].gameData.tiles[y][x]
           .state = 11
+
         rooms[roomInfo.room_id].gameData.tiles[y][x]
           .miss = true
 
@@ -293,6 +298,7 @@ export default (app, http) => {
       const [ y, x ] = index
 
       if (rooms[roomInfo.room_id].gameData.tiles[y][x].bomb) {
+
         rooms[roomInfo.room_id].gameData.tiles[y][x]
           .state = 12
 
@@ -303,10 +309,26 @@ export default (app, http) => {
         rooms[roomInfo.room_id].users[rooms[roomInfo.room_id].users.indexOf(user)]
           .scores.flagged += 1
 
-
       } else {
+
+        const numOfBombs = checkTarget.reduce((count, target) => {
+          if (
+            rooms[roomInfo.room_id].gameData.tiles[y + target[0]] &&
+            rooms[roomInfo.room_id].gameData.tiles[y + target[0]][x + target[1]] &&
+            rooms[roomInfo.room_id].gameData.tiles[y + target[0]][x + target[1]].bomb
+          ) {
+            // console.log(rooms[roomInfo.room_id].gameData.tiles[y + target[0]][x + target[1]].bomb);
+            count += 1
+          }
+          return count
+        }, 0)
+
         rooms[roomInfo.room_id].gameData.tiles[y][x]
-          .state = 12
+          .state = numOfBombs
+
+        // rooms[roomInfo.room_id].gameData.tiles[y][x]
+        //   .state = 12
+
         rooms[roomInfo.room_id].gameData.tiles[y][x]
           .miss = true
 
